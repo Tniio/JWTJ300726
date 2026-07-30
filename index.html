@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153a5b">
+  <meta name="description" content="Creador estático de programas de la Reunión Pública y el Estudio de La Atalaya.">
+  <title>Programas de reuniones</title>
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <header class="app-header no-print">
+    <button class="brand reset-button" type="button" data-route="programs" aria-label="Ir a programas">
+      <span class="brand-mark">PR</span>
+      <span><strong>Programas de reuniones</strong><small>Versión para GitHub Pages</small></span>
+    </button>
+    <nav aria-label="Navegación principal">
+      <button class="nav-link" type="button" data-route="programs">Programas</button>
+      <button class="nav-link" type="button" data-route="catalogs">Catálogos</button>
+      <button class="button button-primary button-small" type="button" data-new-program>Nuevo programa</button>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <div id="message-area" class="messages no-print" aria-live="polite"></div>
+
+    <section id="programs-view" class="app-view no-print">
+      <div class="page-heading">
+        <div>
+          <p class="eyebrow">PLANIFICACIÓN MENSUAL</p>
+          <h1>Programas de reunión</h1>
+          <p>Los programas se guardan en este navegador. También puedes exportar un respaldo JSON.</p>
+        </div>
+        <div class="heading-actions">
+          <label class="button button-secondary file-button">
+            Importar respaldo
+            <input id="import-json" type="file" accept=".json,application/json">
+          </label>
+          <button id="export-json" class="button button-secondary" type="button">Exportar respaldo</button>
+          <button class="button button-primary" type="button" data-new-program>+ Crear programa</button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <label>Año<select id="filter-year"><option value="">Todos</option></select></label>
+        <label>Mes<select id="filter-month"><option value="">Todos</option></select></label>
+        <label>Estado
+          <select id="filter-status">
+            <option value="">Todos</option>
+            <option value="draft">Borrador</option>
+            <option value="final">Finalizado</option>
+          </select>
+        </label>
+        <button id="clear-filters" class="button button-ghost" type="button">Limpiar</button>
+      </div>
+
+      <section class="panel table-panel">
+        <div class="responsive-table">
+          <table class="data-table">
+            <thead><tr><th>Periodo</th><th>Congregación</th><th>Estado</th><th>Modificado</th><th class="align-right">Acciones</th></tr></thead>
+            <tbody id="program-list-body"></tbody>
+          </table>
+        </div>
+        <div id="empty-programs" class="empty-state" hidden>
+          <span class="empty-icon">＋</span>
+          <h2>No hay programas para estos filtros</h2>
+          <p>Crea un programa o limpia los filtros.</p>
+        </div>
+      </section>
+    </section>
+
+    <section id="editor-view" class="app-view no-print" hidden>
+      <div class="page-heading compact">
+        <div>
+          <button class="back-link reset-button" type="button" data-route="programs">← Volver al listado</button>
+          <h1 id="editor-title">Crear programa mensual</h1>
+          <p>Completa las secciones. Los valores nuevos pasarán a los catálogos del navegador.</p>
+        </div>
+        <button id="editor-preview-top" class="button button-secondary" type="button">Vista previa</button>
+      </div>
+
+      <form id="program-form" novalidate>
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="step">01</span>
+            <div><h2>Datos generales</h2><p>Identificación y estado del programa.</p></div>
+          </div>
+          <div class="form-grid general-grid">
+            <label class="field field-wide">Nombre de la congregación
+              <input id="congregation-name" class="form-control" list="congregations-list" maxlength="160" required>
+            </label>
+            <label class="field">Mes<select id="program-month" class="form-control" required></select></label>
+            <label class="field">Año<input id="program-year" class="form-control" type="number" min="2000" max="2100" required></label>
+            <label class="field">Estado
+              <select id="program-status" class="form-control">
+                <option value="draft">Borrador</option>
+                <option value="final">Finalizado</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section row-section" data-row-type="public">
+          <div class="section-heading">
+            <span class="step">02</span>
+            <div><h2>Discursos públicos</h2><p>Reuniones locales del mes.</p></div>
+            <button class="button button-secondary generate-sundays" type="button">Generar domingos del mes</button>
+          </div>
+          <div class="responsive-table">
+            <table class="editor-table public-editor">
+              <thead><tr><th></th><th>Fecha</th><th>Discursante</th><th>N.º</th><th>Título</th><th>Congregación</th><th>Hospitalidad</th><th></th></tr></thead>
+              <tbody data-rows="public"></tbody>
+            </table>
+          </div>
+          <button class="button button-add add-row" type="button">+ Agregar discurso público</button>
+        </section>
+
+        <section class="form-section row-section" data-row-type="outgoing">
+          <div class="section-heading">
+            <span class="step">03</span>
+            <div><h2>Salida de discursantes públicos</h2><p>Asignaciones en otras congregaciones.</p></div>
+          </div>
+          <div class="responsive-table">
+            <table class="editor-table outgoing-editor">
+              <thead><tr><th></th><th>Fecha</th><th>Discursante</th><th>N.º</th><th>Título</th><th></th></tr></thead>
+              <tbody data-rows="outgoing"></tbody>
+            </table>
+          </div>
+          <button class="button button-add add-row" type="button">+ Agregar salida de discursante</button>
+        </section>
+
+        <section class="form-section row-section" data-row-type="watchtower">
+          <div class="section-heading">
+            <span class="step">04</span>
+            <div><h2>Estudio de La Atalaya y presidencia</h2><p>Presidente y lector de cada reunión.</p></div>
+            <button class="button button-secondary generate-sundays" type="button">Generar domingos del mes</button>
+          </div>
+          <div class="responsive-table">
+            <table class="editor-table watchtower-editor">
+              <thead><tr><th></th><th>Fecha</th><th>Presidente</th><th>Lector de La Atalaya</th><th></th></tr></thead>
+              <tbody data-rows="watchtower"></tbody>
+            </table>
+          </div>
+          <button class="button button-add add-row" type="button">+ Agregar asignación</button>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <span class="step">05</span>
+            <div><h2>Portadas de la revista</h2><p>JPG, PNG o WEBP · máximo 5 MB por imagen.</p></div>
+          </div>
+          <div class="cover-upload-grid">
+            <div class="cover-upload">
+              <div class="upload-preview" id="preview-left"><span>Portada izquierda</span></div>
+              <label class="field">Portada izquierda<input id="cover-left" type="file" accept=".jpg,.jpeg,.png,.webp"></label>
+              <button class="text-button danger-link remove-cover" data-cover="left" type="button">Eliminar portada</button>
+            </div>
+            <div class="cover-upload">
+              <div class="upload-preview" id="preview-right"><span>Portada derecha</span></div>
+              <label class="field">Portada derecha<input id="cover-right" type="file" accept=".jpg,.jpeg,.png,.webp"></label>
+              <button class="text-button danger-link remove-cover" data-cover="right" type="button">Eliminar portada</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="sticky-actions">
+          <button class="button button-ghost" type="button" data-route="programs">Cancelar</button>
+          <button id="save-draft" class="button button-secondary" type="button">Guardar en este navegador</button>
+          <button id="save-preview" class="button button-primary" type="button">Guardar y ver vista previa</button>
+          <button id="print-from-editor" class="button button-dark" type="button">Vista previa para PDF</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="preview-view" class="app-view" hidden>
+      <div class="preview-toolbar no-print">
+        <div>
+          <button id="back-to-editor" class="back-link reset-button" type="button">← Volver a editar</button>
+          <h1>Vista previa del programa</h1>
+          <p>Usa “Imprimir / Guardar PDF” y elige “Guardar como PDF” en el navegador.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="preview-edit" class="button button-secondary" type="button">Editar</button>
+          <button id="print-program" class="button button-dark" type="button">Imprimir / Guardar PDF</button>
+        </div>
+      </div>
+      <div id="overflow-warning" class="overflow-warning no-print" hidden>
+        El contenido supera una página A4. La impresión continuará en una segunda página sin dividir filas.
+      </div>
+      <div class="preview-stage">
+        <article id="program-document" class="program-document">
+          <header class="document-header">
+            <h1 id="doc-congregation">CONGREGACIÓN</h1>
+            <p id="doc-subtitle">REUNIÓN PÚBLICA Y ESTUDIO DE LA ATALAYA</p>
+          </header>
+          <section class="document-section">
+            <h2>DISCURSOS PÚBLICOS</h2>
+            <table>
+              <colgroup><col class="date-col"><col class="person-col"><col class="topic-col"><col class="congregation-col"><col class="hospitality-col"></colgroup>
+              <thead><tr><th>FECHA</th><th>DISCURSANTE</th><th>TEMA</th><th>CONGREGACIÓN</th><th>HOSPITALIDAD</th></tr></thead>
+              <tbody id="doc-public-rows"></tbody>
+            </table>
+          </section>
+          <section class="document-section">
+            <h2>SALIDA DE DISCURSANTES PÚBLICOS</h2>
+            <table>
+              <colgroup><col class="date-col"><col class="out-person-col"><col></colgroup>
+              <thead><tr><th>FECHA</th><th>DISCURSANTE</th><th>TEMA</th></tr></thead>
+              <tbody id="doc-outgoing-rows"></tbody>
+            </table>
+          </section>
+          <section class="document-section">
+            <h2>ESTUDIO DE LA ATALAYA Y PRESIDENCIA</h2>
+            <table>
+              <colgroup><col class="date-col"><col><col></colgroup>
+              <thead><tr><th>FECHA</th><th>PRESIDENTE</th><th>LECTOR DE LA ATALAYA</th></tr></thead>
+              <tbody id="doc-watchtower-rows"></tbody>
+            </table>
+          </section>
+          <section class="document-covers">
+            <div id="doc-cover-left" class="document-cover"><span>PORTADA DE LA REVISTA</span></div>
+            <div id="doc-cover-right" class="document-cover"><span>PORTADA DE LA REVISTA</span></div>
+          </section>
+          <footer class="page-number">1</footer>
+        </article>
+      </div>
+    </section>
+
+    <section id="catalogs-view" class="app-view no-print" hidden>
+      <div class="page-heading compact">
+        <div><p class="eyebrow">DATOS REUTILIZABLES</p><h1>Catálogos</h1><p>Los elementos inactivos permanecen en los programas ya creados.</p></div>
+      </div>
+      <nav class="tab-nav" id="catalog-tabs" aria-label="Tipos de catálogo">
+        <button class="active" type="button" data-catalog="people">Personas</button>
+        <button type="button" data-catalog="congregations">Congregaciones</button>
+        <button type="button" data-catalog="talks">Discursos</button>
+        <button type="button" data-catalog="hospitality">Hospitalidad</button>
+      </nav>
+      <div class="catalog-layout">
+        <section class="panel catalog-form">
+          <h2 id="catalog-form-title">Agregar persona</h2>
+          <form id="catalog-form"></form>
+        </section>
+        <section class="panel table-panel">
+          <div class="responsive-table">
+            <table class="data-table">
+              <thead><tr><th>Dato</th><th>Estado</th><th class="align-right">Acciones</th></tr></thead>
+              <tbody id="catalog-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer no-print">Aplicación estática · Compatible con GitHub Pages</footer>
+
+  <datalist id="people-list"></datalist>
+  <datalist id="congregations-list"></datalist>
+  <datalist id="hospitality-list"></datalist>
+  <datalist id="talk-titles-list"></datalist>
+
+  <script src="./assets/app.js"></script>
+</body>
+</html>
