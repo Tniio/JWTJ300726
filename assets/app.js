@@ -350,7 +350,7 @@
 
       const required = type === "watchtower"
         ? ["date", "chairman", "reader"]
-        : ["date", "speaker", "talkNumber", "talkTitle"];
+        : ["date", "speaker", "talkTitle"];
       required.forEach((field) => {
         if (!fields[field]) {
           markInvalid(row.querySelector(`[data-field="${field}"]`));
@@ -569,7 +569,9 @@
         row.append(
           makeCell(formatDate(item.date)),
           makeCell(item.speaker),
-          makeCell(item.talkTitle, { strongPrefix: String(item.talkNumber) }),
+          makeCell(item.talkTitle, {
+            strongPrefix: item.talkNumber ? String(item.talkNumber) : ""
+          })
           makeCell(item.congregation),
           makeCell(item.hospitality)
         );
