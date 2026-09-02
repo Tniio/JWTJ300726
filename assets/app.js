@@ -289,7 +289,7 @@
     if (type === "public" || type === "outgoing") {
       row.append(
         inputCell(makeInput("speaker", data.speaker, { list: "people-list", maxLength: 160 })),
-        inputCell(makeInput("talkNumber", data.talkNumber, { type: "number", min: 1, max: 999 }), "talk-number"),
+        inputCell(makeInput("talkNumber", data.talkNumber, { type: "number", min: 0, max: 999 }), "talk-number"),
         inputCell(makeInput("talkTitle", data.talkTitle, { list: "talk-titles-list", maxLength: 260 }))
       );
       if (type === "public") {
